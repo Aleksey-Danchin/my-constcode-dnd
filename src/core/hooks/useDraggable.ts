@@ -9,12 +9,13 @@ import {
 import useDndManager from "../hooks/useDndManager";
 import useDroppableContext from "../hooks/useDroppableContext";
 import useKind from "../hooks/useKind";
-import { isIntersaction } from "../util";
+import { isIntersection } from "../util";
 
 interface useDraggableProps {
 	innerRef?: RefObject<Element>;
 	index: string;
 	kind?: string[];
+	handles?: Array<RefObject<Element | HTMLElement>>;
 
 	onDragStart?: dragStartHandler;
 	onDrag?: dragHandler;
@@ -36,7 +37,7 @@ const useDraggable = ({
 	onDragStart,
 	onDrag,
 	onDragEnd,
-}: useDraggableProps): [RefObject<Element>, CSSProperties] => {
+}: useDraggableProps): [RefObject<Element>, CSSProperties, Boolean] => {
 	const [dragged, setDragged] = useState(false);
 	const [offset, setOffset] = useState({ x: 0, y: 0 });
 
@@ -47,6 +48,10 @@ const useDraggable = ({
 		prevDraggable,
 		addDraggableMemeber,
 		removeDraggableMemeber,
+
+		onDragStart: managerDragStartHandler,
+		onDrag: managerDragHandler,
+		onDragEnd: managerDragEndHandler,
 	} = useDndManager();
 
 	const myKind = useKind(kind);
@@ -61,7 +66,7 @@ const useDraggable = ({
 		let parent: IDroppableContext | undefined = droppableParent;
 
 		while (parent) {
-			if (isIntersaction(parent.kind, myKind)) {
+			if (isIntersection(parent.kind, myKind)) {
 				return parent.index;
 			}
 
@@ -133,6 +138,10 @@ const useDraggable = ({
 			if (onDragStart) {
 				onDragStart(mouse.event, draggable, droppable);
 			}
+
+			if (managerDragStartHandler) {
+				managerDragStartHandler(mouse.event, draggable, droppable);
+			}
 		}
 	}, [
 		draggable,
@@ -145,11 +154,18 @@ const useDraggable = ({
 		mouse.y,
 		onDragStart,
 		ref,
+		managerDragStartHandler,
 	]);
 
 	useEffect(() => {
-		if (draggable && dragged && mouse.dx | mouse.dy && onDrag) {
-			onDrag(mouse.event, draggable, droppable);
+		if (draggable && dragged && mouse.dx | mouse.dy) {
+			if (onDrag) {
+				onDrag(mouse.event, draggable, droppable);
+			}
+
+			if (managerDragHandler) {
+				managerDragHandler(mouse.event, draggable, droppable);
+			}
 		}
 	}, [
 		draggable,
@@ -159,6 +175,7 @@ const useDraggable = ({
 		mouse.event,
 		onDrag,
 		droppable,
+		managerDragHandler,
 	]);
 
 	useEffect(() => {
@@ -170,10 +187,22 @@ const useDraggable = ({
 			if (onDragEnd) {
 				onDragEnd(mouse.event, prevDraggable, droppable);
 			}
-		}
-	}, [draggable, dragged, mouse.event, onDragEnd, prevDraggable, droppable]);
 
-	return [ref, style];
+			if (managerDragEndHandler) {
+				managerDragEndHandler(mouse.event, prevDraggable, droppable);
+			}
+		}
+	}, [
+		draggable,
+		dragged,
+		mouse.event,
+		onDragEnd,
+		prevDraggable,
+		droppable,
+		managerDragEndHandler,
+	]);
+
+	return [ref, style, dragged];
 };
 
 export default useDraggable;

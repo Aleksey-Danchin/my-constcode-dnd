@@ -6,10 +6,19 @@ interface IDndManagerContext {
 	prevDraggable: IDndDraggableMember | null;
 	droppable: IDndDroppableMember | null;
 	prevDroppable: IDndDroppableMember | null;
+
 	addDraggableMemeber: (memeber: IDndDraggableMember) => void;
 	removeDraggableMemeber: (memeber: IDndDraggableMember) => void;
 	addDroppableMember: (memeber: IDndMember) => void;
 	removeDroppableMember: (memeber: IDndMember) => void;
+
+	onDragStart?: dragStarthandler;
+	onDrag?: draghandler;
+	onDragEnd?: dragEndhandler;
+	onDragEnter?: dragEnterhandler;
+	onDragLeave?: dragLeavehandler;
+	onDragOver?: dragOverhandler;
+	onDrop?: drophandler;
 }
 
 interface IDroppableContext {

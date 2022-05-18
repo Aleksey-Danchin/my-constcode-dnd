@@ -37,7 +37,8 @@ const useDroppable = ({
 	onDrop,
 }: useDroppableProps): [
 	FC<{ children: ReactNode | ReactNode[] }>,
-	RefObject<Element>
+	RefObject<Element>,
+	Boolean
 ] => {
 	const [zonned, setZonned] = useState(false);
 
@@ -49,10 +50,16 @@ const useDroppable = ({
 		prevDroppable,
 		addDroppableMember,
 		removeDroppableMember,
+		onDragEnter: managerDragEnterHandler,
+		onDragLeave: managerDragLeaveHandler,
+		onDragOver: managerDragOverHandler,
+		onDrop: managerDropHandler,
 	} = useDndManager();
+
 	const parent = useDroppableContext();
 
 	const myKind = useKind(kind);
+
 	const ref = useMemo(
 		() => (innerRef ? innerRef : createRef<Element>()),
 		[innerRef]
@@ -92,10 +99,15 @@ const useDroppable = ({
 			if (onDragEnter) {
 				onDragEnter(mouse.event, draggable, droppable);
 			}
+
+			if (managerDragEnterHandler) {
+				managerDragEnterHandler(mouse.event, draggable, droppable);
+			}
 		}
 	}, [
 		draggable,
 		droppable,
+		managerDragEnterHandler,
 		mouse.dx,
 		mouse.dy,
 		mouse.event,
@@ -105,18 +117,19 @@ const useDroppable = ({
 	]);
 
 	useEffect(() => {
-		if (
-			draggable &&
-			droppable &&
-			zonned &&
-			onDragOver &&
-			mouse.dx | mouse.dy
-		) {
-			onDragOver(mouse.event, draggable, droppable);
+		if (draggable && droppable && zonned && mouse.dx | mouse.dy) {
+			if (onDragOver) {
+				onDragOver(mouse.event, draggable, droppable);
+			}
+
+			if (managerDragOverHandler) {
+				managerDragOverHandler(mouse.event, draggable, droppable);
+			}
 		}
 	}, [
 		draggable,
 		droppable,
+		managerDragOverHandler,
 		mouse.dx,
 		mouse.dy,
 		mouse.event,
@@ -127,20 +140,25 @@ const useDroppable = ({
 	useEffect(() => {
 		if (
 			zonned &&
-			!droppable &&
 			draggable &&
 			prevDroppable &&
-			prevDroppable.element === ref.current
+			prevDroppable.element === ref.current &&
+			(!droppable || droppable.element !== ref.current)
 		) {
 			setZonned(false);
 
 			if (onDragLeave) {
 				onDragLeave(mouse.event, draggable, prevDroppable);
 			}
+
+			if (managerDragLeaveHandler) {
+				managerDragLeaveHandler(mouse.event, draggable, prevDroppable);
+			}
 		}
 	}, [
 		draggable,
 		droppable,
+		managerDragLeaveHandler,
 		mouse.event,
 		onDragLeave,
 		prevDroppable,
@@ -149,29 +167,28 @@ const useDroppable = ({
 	]);
 
 	useEffect(() => {
-		if (
-			zonned &&
-			!draggable &&
-			prevDraggable &&
-			!mouse.left &&
-			mouse.pleft
-		) {
+		if (zonned && !draggable && prevDraggable) {
 			setZonned(false);
 
-			if (
-				prevDroppable &&
-				prevDroppable.element === ref.current &&
-				onDrop
-			) {
-				onDrop(mouse.event, prevDraggable, prevDroppable);
+			if (prevDroppable && prevDroppable.element === ref.current) {
+				if (onDrop) {
+					onDrop(mouse.event, prevDraggable, prevDroppable);
+				}
+
+				if (managerDropHandler) {
+					managerDropHandler(
+						mouse.event,
+						prevDraggable,
+						prevDroppable
+					);
+				}
 			}
 		}
 	}, [
 		draggable,
 		mouse.event,
-		mouse.left,
-		mouse.pleft,
 		onDrop,
+		managerDropHandler,
 		prevDraggable,
 		prevDroppable,
 		ref,
@@ -187,7 +204,7 @@ const useDroppable = ({
 		[value]
 	);
 
-	return [Wrapper, ref];
+	return [Wrapper, ref, zonned];
 };
 
 export default useDroppable;
