@@ -73,9 +73,11 @@ const DndManager: FC<DndManagerProps> = ({
 			const element = elements[0];
 
 			for (const member of draggableMembers) {
-				if (member.element === element) {
-					setDraggable(member);
-					break;
+				for (const handle of member.handles) {
+					if (handle.current === element) {
+						setDraggable(member);
+						break;
+					}
 				}
 			}
 		}

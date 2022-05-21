@@ -2,10 +2,11 @@ import { FC, useState } from "react";
 
 import Example01 from "./examples/Example01";
 import Example02 from "./examples/Example02";
+import Example03 from "./examples/Example03";
 
 import "./style.css";
 
-const examples = [Example01, Example02];
+const examples = [Example01, Example02, Example03];
 
 const App: FC = () => {
 	const [example, setExample] = useState(0);
