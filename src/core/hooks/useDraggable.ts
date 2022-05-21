@@ -6,10 +6,19 @@ import {
 	useMemo,
 	useState,
 } from "react";
+
 import useDndManager from "../hooks/useDndManager";
 import useDroppableContext from "../hooks/useDroppableContext";
 import useKind from "../hooks/useKind";
+import {
+	dragEndHandler,
+	dragHandler,
+	dragStartHandler,
+	IDndDraggableMember,
+	IDroppableContext,
+} from "../types";
 import { isIntersection } from "../util";
+import useHandles from "./useHandles";
 
 interface useDraggableProps {
 	innerRef?: RefObject<Element>;
@@ -33,6 +42,7 @@ const useDraggable = ({
 	innerRef,
 	index,
 	kind = kindDefault,
+	handles = [],
 
 	onDragStart,
 	onDrag,
@@ -55,10 +65,13 @@ const useDraggable = ({
 	} = useDndManager();
 
 	const myKind = useKind(kind);
+
 	const ref = useMemo(
 		() => (innerRef ? innerRef : createRef<Element>()),
 		[innerRef]
 	);
+
+	const myHandles = useHandles(ref, handles);
 
 	const droppableParent = useDroppableContext();
 
@@ -94,6 +107,7 @@ const useDraggable = ({
 
 			const memeber: IDndDraggableMember = {
 				index,
+				handles: myHandles,
 				kind: myKind,
 				element: current,
 				source,
@@ -110,6 +124,7 @@ const useDraggable = ({
 	}, [
 		addDraggableMemeber,
 		index,
+		myHandles,
 		myKind,
 		ref,
 		removeDraggableMemeber,

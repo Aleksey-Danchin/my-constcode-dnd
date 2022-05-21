@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import useDraggable from "../../core/hooks/useDraggable";
+import { dragStartHandler } from "../../core/types";
 
 const distance = 75;
 

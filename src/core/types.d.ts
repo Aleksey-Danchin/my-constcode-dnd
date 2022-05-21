@@ -1,5 +1,7 @@
 // Contexts
 
+import { RefObject } from "react";
+
 interface IDndManagerContext {
 	mouse: IMouse;
 	draggable: IDndDraggableMember | null;
@@ -46,6 +48,7 @@ interface IDndMember {
 }
 
 interface IDndDraggableMember extends IDndMember {
+	handles: Array<RefObject<Element>>;
 	source: string | null;
 }
 
