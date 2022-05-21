@@ -114,11 +114,9 @@ const useDraggable = ({
 			};
 
 			addDraggableMemeber(memeber);
-			current.addEventListener("selectstart", startselectHandler);
 
 			return () => {
 				removeDraggableMemeber(memeber);
-				current.removeEventListener("selectstart", startselectHandler);
 			};
 		}
 	}, [
@@ -130,6 +128,31 @@ const useDraggable = ({
 		removeDraggableMemeber,
 		source,
 	]);
+
+	useEffect(() => {
+		const elements: Array<Element> = [];
+
+		for (const handle of myHandles) {
+			if (handle.current) {
+				elements.push(handle.current);
+			}
+		}
+
+		if (elements.length) {
+			for (const element of elements) {
+				element.addEventListener("selectstart", startselectHandler);
+			}
+
+			return () => {
+				for (const element of elements) {
+					element.removeEventListener(
+						"selectstart",
+						startselectHandler
+					);
+				}
+			};
+		}
+	}, [myHandles]);
 
 	useEffect(() => {
 		if (

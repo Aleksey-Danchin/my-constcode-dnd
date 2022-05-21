@@ -17,12 +17,15 @@ const Item: FC<ItemProps> = ({ index }) => {
 	const dragStyle = useMemo<CSSProperties>(() => {
 		if (dragged) {
 			return {
+				backgroundColor: "white",
 				border: "5px dashed",
 				borderColor: "green",
 			};
 		}
 
-		return {};
+		return {
+			backgroundColor: "white",
+		};
 	}, [dragged]);
 
 	return (

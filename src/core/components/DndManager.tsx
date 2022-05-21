@@ -63,6 +63,49 @@ const DndManager: FC<DndManagerProps> = ({
 	const [prevDroppable, setPrevDroppable] =
 		useState<IDndDroppableMember | null>(null);
 
+	const value = useMemo(
+		() => ({
+			mouse,
+			draggable,
+			prevDraggable,
+			droppable,
+			prevDroppable,
+
+			addDraggableMemeber,
+			removeDraggableMemeber,
+			addDroppableMember,
+			removeDroppableMember,
+
+			onDragStart,
+			onDrag,
+			onDragEnd,
+			onDragEnter,
+			onDragLeave,
+			onDragOver,
+			onDrop,
+		}),
+		[
+			mouse,
+			draggable,
+			prevDraggable,
+			droppable,
+			prevDroppable,
+
+			addDraggableMemeber,
+			removeDraggableMemeber,
+			addDroppableMember,
+			removeDroppableMember,
+
+			onDragStart,
+			onDrag,
+			onDragEnd,
+			onDragEnter,
+			onDragLeave,
+			onDragOver,
+			onDrop,
+		]
+	);
+
 	useEffect(() => {
 		if (
 			mouse.left &&
@@ -108,51 +151,13 @@ const DndManager: FC<DndManagerProps> = ({
 		}
 	}, [draggable, droppableMemebrs, elements]);
 
-	const value = useMemo(
-		() => ({
-			mouse,
-			draggable,
-			prevDraggable,
-			droppable,
-			prevDroppable,
+	useEffect(() => {
+		setPrevDraggable(draggable);
+	}, [draggable]);
 
-			addDraggableMemeber,
-			removeDraggableMemeber,
-			addDroppableMember,
-			removeDroppableMember,
-
-			onDragStart,
-			onDrag,
-			onDragEnd,
-			onDragEnter,
-			onDragLeave,
-			onDragOver,
-			onDrop,
-		}),
-		[
-			mouse,
-			draggable,
-			prevDraggable,
-			droppable,
-			prevDroppable,
-
-			addDraggableMemeber,
-			removeDraggableMemeber,
-			addDroppableMember,
-			removeDroppableMember,
-
-			onDragStart,
-			onDrag,
-			onDragEnd,
-			onDragEnter,
-			onDragLeave,
-			onDragOver,
-			onDrop,
-		]
-	);
-
-	useEffect(() => setPrevDraggable(draggable), [draggable]);
-	useEffect(() => setPrevDroppable(droppable), [droppable]);
+	useEffect(() => {
+		setPrevDroppable(droppable);
+	}, [droppable]);
 
 	useEffect(() => {
 		if (droppable) {

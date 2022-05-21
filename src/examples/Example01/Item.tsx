@@ -11,23 +11,65 @@ const Item: FC<ItemProps> = ({ index }) => {
 	const dragStyle = useMemo<CSSProperties>(() => {
 		if (dragged) {
 			return {
-				border: "5px dashed",
+				backgroundColor: "white",
+				borderStyle: "dashed",
 				borderColor: "green",
 			};
 		}
 
-		return {};
+		return {
+			backgroundColor: "white",
+		};
 	}, [dragged]);
 
+	const ghost = useMemo(() => {
+		if (dragged && ref.current) {
+			const style = getComputedStyle(ref.current);
+
+			return (
+				<div
+					style={{
+						marginLeft: style.marginLeft,
+						borderLeft: style.borderLeft,
+						paddingLeft: style.paddingLeft,
+						width: style.width,
+						paddingRight: style.paddingRight,
+						borderRight: style.borderRight,
+						marginRight: style.marginRight,
+
+						marginTop: style.marginTop,
+						borderTop: style.borderTop,
+						paddingTop: style.paddingTop,
+						height: style.height,
+						paddingBottom: style.paddingBottom,
+						borderBottom: style.borderBottom,
+						marginBottom: style.marginBottom,
+
+						borderColor: "rgba(0, 0, 0, 0)",
+						color: "rgba(0, 0, 0, 0)",
+						display: "inline-block",
+					}}
+				>
+					1
+				</div>
+			);
+		}
+
+		return null;
+	}, [dragged, ref]);
+
 	return (
-		<div
-			ref={ref as RefObject<HTMLDivElement>}
-			style={{ ...style, ...dragStyle }}
-			className="draggable"
-			data-index={index}
-		>
-			{index}
-		</div>
+		<>
+			{ghost}
+			<div
+				ref={ref as RefObject<HTMLDivElement>}
+				style={{ ...style, ...dragStyle }}
+				className="draggable"
+				data-index={index}
+			>
+				{index}
+			</div>
+		</>
 	);
 };
 
